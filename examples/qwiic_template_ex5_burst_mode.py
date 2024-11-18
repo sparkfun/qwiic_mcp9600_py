@@ -1,8 +1,13 @@
 #!/usr/bin/env python
 #-------------------------------------------------------------------------------
-# qwiic_mcp9600_ex1_basic.py
+# qwiic_mcp9600_ex5_burst_mode.py
 #
-# This example outputs the ambient and thermocouple temperatures from the MCP9600 sensor.
+#   This example configures the shutdown (or "operating") mode that the MCP9600 runs in. Shutdown mode disables all
+#   power consuming activities on the MCP9600, including measurements, but it will still respond to I2C commands sent
+#   over Qwiic. Burst mode is similar, where the MCP9600 is shutdown until the Arduino asks it to wake up and take a 
+#   number of samples, apply any filtering, update any outputs, and then enter shutdown mode. This example walks
+#   through that process!
+#
 #-------------------------------------------------------------------------------
 # Written by SparkFun Electronics, November 2024
 #
@@ -37,9 +42,13 @@ import qwiic_mcp9600
 import sys
 import time 
 
+# Change the mode and sample number of the thermocouple here!
+mode = qwiic_mcp9600.QwiicMCP9600.kShutdownModeBurst
+samples = qwiic_mcp9600.QwiicMCP9600.kSamples8
+
 def runExample():
 
-	print("\nQwiic MCP9600 Example 1 - Basic Readings\n")
+	print("\nQwiic MCP9600 Example 2 - Set Type\n")
 
 	# Create instance of device
 	myThermo = qwiic_mcp9600.QwiicMCP9600()
@@ -53,6 +62,10 @@ def runExample():
 	# Initialize the device
 	myThermo.begin()
 
+	# Set the MCP9600 to burst mode!
+	myThermo.set_burst_samples(samples)
+	myThermo.set_shutdown_mode(mode)
+
 	while True:
 		if myThermo.available():
 			# Read temperatures
@@ -63,8 +76,8 @@ def runExample():
 			# Print temperatures
 			print(f"Thermocouple: {thermocouple_temp} °C   Ambient: {ambient_temp} °C   Temperature Delta: {temp_delta} °C")
 			
-		# Delay to avoid hammering the I2C bus
-		time.sleep(0.02)
+			# clear the register and start a new burst cycle!
+			myThermo.start_burst()
 
 if __name__ == '__main__':
 	try:

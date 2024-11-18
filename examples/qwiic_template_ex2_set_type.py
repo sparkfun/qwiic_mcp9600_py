@@ -1,8 +1,11 @@
 #!/usr/bin/env python
 #-------------------------------------------------------------------------------
-# qwiic_mcp9600_ex1_basic.py
+# qwiic_mcp9600_ex2_set_type.py
 #
-# This example outputs the ambient and thermocouple temperatures from the MCP9600 sensor.
+#   This example outputs the ambient and thermocouple temperatures from the MCP9600 sensor, but allows for a non
+#   K-type thermocouple to be used.
+#   The Qwiic MCP9600 supports K/J/T/N/S/E/B/R type thermocouples, and the type can be configured below!
+# 
 #-------------------------------------------------------------------------------
 # Written by SparkFun Electronics, November 2024
 #
@@ -37,9 +40,20 @@ import qwiic_mcp9600
 import sys
 import time 
 
+# Change the type of the thermocouple here!
+type = qwiic_mcp9600.QwiicMCP9600.kTypeS
+# Other options are:
+	# qwiic_mcp9600.QwiicMCP9600.kTypeK
+	# qwiic_mcp9600.QwiicMCP9600.kTypeJ
+	# qwiic_mcp9600.QwiicMCP9600.kTypeT
+	# qwiic_mcp9600.QwiicMCP9600.kTypeN
+	# qwiic_mcp9600.QwiicMCP9600.kTypeE
+	# qwiic_mcp9600.QwiicMCP9600.kTypeB
+	# qwiic_mcp9600.QwiicMCP9600.kTypeR
+
 def runExample():
 
-	print("\nQwiic MCP9600 Example 1 - Basic Readings\n")
+	print("\nQwiic MCP9600 Example 2 - Set Type\n")
 
 	# Create instance of device
 	myThermo = qwiic_mcp9600.QwiicMCP9600()
@@ -52,6 +66,15 @@ def runExample():
 
 	# Initialize the device
 	myThermo.begin()
+	
+	# Change the thermocouple type being used
+	print("Changing thermocouple type!")
+	myThermo.set_thermocouple_type(type)
+
+	if myThermo.get_thermocouple_type() == type:
+		print("Thermocouple type set successfully!")
+	else:
+		print("Failed to set thermocouple type!")
 
 	while True:
 		if myThermo.available():
