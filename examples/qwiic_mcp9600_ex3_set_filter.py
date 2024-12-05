@@ -1,13 +1,20 @@
 #!/usr/bin/env python
 #-------------------------------------------------------------------------------
-# qwiic_mcp9600_ex5_burst_mode.py
+# qwiic_mcp9600_ex3_set_filter.py
 #
-#   This example configures the shutdown (or "operating") mode that the MCP9600 runs in. Shutdown mode disables all
-#   power consuming activities on the MCP9600, including measurements, but it will still respond to I2C commands sent
-#   over Qwiic. Burst mode is similar, where the MCP9600 is shutdown until the Arduino asks it to wake up and take a 
-#   number of samples, apply any filtering, update any outputs, and then enter shutdown mode. This example walks
-#   through that process!
-#
+#   This example outputs the ambient and thermocouple temperatures from the MCP9600 sensor, but allows the filtering
+#   onboard the MCP9600 to be controlled. The MCP9600 implements an exponential running average filter, the
+#   "strength" of which is programmable! The setFilterCoefficient function takes a coefficient between 0 and 7, 
+#   where 0 disables the filter, 1 corresponds to minimum filtering, and 7 enables maximum filtering. The "strength"
+#   of the filter just refers to how long it takes for the filter to respond to a step function input. 
+
+#   Quick Note! For some reason the getFilterCoefficient() function is a little wierd about returning the proper
+#   data. This is a known issue and while we've done our best to fix it, every once in a while it might return a 0,
+#   or the wrong value entirely. We think this is an issue with the MCP9600, and there's not much we can do about it.
+#   If you'd like to learn more or contact us, check out this issue on GitHub!
+
+#   https://github.com/sparkfun/SparkFun_MCP9600_Arduino_Library/issues/1
+# 
 #-------------------------------------------------------------------------------
 # Written by SparkFun Electronics, November 2024
 #
@@ -42,13 +49,12 @@ import qwiic_mcp9600
 import sys
 import time 
 
-# Change the mode and sample number of the thermocouple here!
-mode = qwiic_mcp9600.QwiicMCP9600.kShutdownModeBurst
-samples = qwiic_mcp9600.QwiicMCP9600.kSamples8
+# Change the coefficient here!
+coefficient = 3
 
 def runExample():
 
-	print("\nQwiic MCP9600 Example 2 - Set Type\n")
+	print("\nQwiic MCP9600 Example 3 - Set Filter\n")
 
 	# Create instance of device
 	myThermo = qwiic_mcp9600.QwiicMCP9600()
@@ -61,10 +67,18 @@ def runExample():
 
 	# Initialize the device
 	myThermo.begin()
+	
+	# Print the filter coefficient that's about to be set
+	print(f"Setting Filter coefficient to {coefficient}!")
 
-	# Set the MCP9600 to burst mode!
-	myThermo.set_burst_samples(samples)
-	myThermo.set_shutdown_mode(mode)
+	myThermo.set_filter_coefficient(coefficient)
+
+	# Tell us if the coefficient was set successfully
+	if myThermo.get_filter_coefficient() == coefficient:
+		print("Filter Coefficient set successfully!")
+	else:
+		print("Setting filter coefficient failed!")
+		print(f"The value of the coefficient is: {myThermo.get_filter_coefficient()}")
 
 	while True:
 		if myThermo.available():
@@ -72,12 +86,13 @@ def runExample():
 			thermocouple_temp = myThermo.get_thermocouple_temp()
 			ambient_temp = myThermo.get_ambient_temp()
 			temp_delta = myThermo.get_temp_delta()
+			filter_coef = myThermo.get_filter_coefficient()
 
 			# Print temperatures
-			print(f"Thermocouple: {thermocouple_temp} °C   Ambient: {ambient_temp} °C   Temperature Delta: {temp_delta} °C")
+			print(f"Thermocouple: {thermocouple_temp}C   Ambient: {ambient_temp}C   Temperature Delta: {temp_delta}C Filter Coefficient: {filter_coef}")
 			
-			# clear the register and start a new burst cycle!
-			myThermo.start_burst()
+		# Delay to avoid hammering the I2C bus
+		time.sleep(0.02)
 
 if __name__ == '__main__':
 	try:

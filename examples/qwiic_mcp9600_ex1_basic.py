@@ -61,7 +61,7 @@ def runExample():
 			temp_delta = myThermo.get_temp_delta()
 
 			# Print temperatures
-			print(f"Thermocouple: {thermocouple_temp} °C   Ambient: {ambient_temp} °C   Temperature Delta: {temp_delta} °C")
+			print(f"Thermocouple: {thermocouple_temp}C   Ambient: {ambient_temp}C   Temperature Delta: {temp_delta}C")
 			
 		# Delay to avoid hammering the I2C bus
 		time.sleep(0.02)

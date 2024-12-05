@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 #-------------------------------------------------------------------------------
-# qwiic_mcp9600_ex2_set_type.py
+# qwiic_mcp9600_ex5_burst_mode.py
 #
-#   This example outputs the ambient and thermocouple temperatures from the MCP9600 sensor, but allows for a non
-#   K-type thermocouple to be used.
-#   The Qwiic MCP9600 supports K/J/T/N/S/E/B/R type thermocouples, and the type can be configured below!
-# 
+#   This example configures the shutdown (or "operating") mode that the MCP9600 runs in. Shutdown mode disables all
+#   power consuming activities on the MCP9600, including measurements, but it will still respond to I2C commands sent
+#   over Qwiic. Burst mode is similar, where the MCP9600 is shutdown until the Arduino asks it to wake up and take a 
+#   number of samples, apply any filtering, update any outputs, and then enter shutdown mode. This example walks
+#   through that process!
+#
 #-------------------------------------------------------------------------------
 # Written by SparkFun Electronics, November 2024
 #
@@ -40,20 +42,13 @@ import qwiic_mcp9600
 import sys
 import time 
 
-# Change the type of the thermocouple here!
-type = qwiic_mcp9600.QwiicMCP9600.kTypeS
-# Other options are:
-	# qwiic_mcp9600.QwiicMCP9600.kTypeK
-	# qwiic_mcp9600.QwiicMCP9600.kTypeJ
-	# qwiic_mcp9600.QwiicMCP9600.kTypeT
-	# qwiic_mcp9600.QwiicMCP9600.kTypeN
-	# qwiic_mcp9600.QwiicMCP9600.kTypeE
-	# qwiic_mcp9600.QwiicMCP9600.kTypeB
-	# qwiic_mcp9600.QwiicMCP9600.kTypeR
+# Change the mode and sample number of the thermocouple here!
+mode = qwiic_mcp9600.QwiicMCP9600.kShutdownModeBurst
+samples = qwiic_mcp9600.QwiicMCP9600.kBurstSample8
 
 def runExample():
 
-	print("\nQwiic MCP9600 Example 2 - Set Type\n")
+	print("\nQwiic MCP9600 Example 5 - Burst Mode\n")
 
 	# Create instance of device
 	myThermo = qwiic_mcp9600.QwiicMCP9600()
@@ -66,15 +61,10 @@ def runExample():
 
 	# Initialize the device
 	myThermo.begin()
-	
-	# Change the thermocouple type being used
-	print("Changing thermocouple type!")
-	myThermo.set_thermocouple_type(type)
 
-	if myThermo.get_thermocouple_type() == type:
-		print("Thermocouple type set successfully!")
-	else:
-		print("Failed to set thermocouple type!")
+	# Set the MCP9600 to burst mode!
+	myThermo.set_burst_samples(samples)
+	myThermo.set_shutdown_mode(mode)
 
 	while True:
 		if myThermo.available():
@@ -84,10 +74,10 @@ def runExample():
 			temp_delta = myThermo.get_temp_delta()
 
 			# Print temperatures
-			print(f"Thermocouple: {thermocouple_temp} °C   Ambient: {ambient_temp} °C   Temperature Delta: {temp_delta} °C")
+			print(f"Thermocouple: {thermocouple_temp}C   Ambient: {ambient_temp}C   Temperature Delta: {temp_delta}C")
 			
-		# Delay to avoid hammering the I2C bus
-		time.sleep(0.02)
+			# clear the register and start a new burst cycle!
+			myThermo.start_burst()
 
 if __name__ == '__main__':
 	try:

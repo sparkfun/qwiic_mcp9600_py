@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #-------------------------------------------------------------------------------
-# qwiic_mcp9600_ex2_config_temp_alert.py
+# qwiic_mcp9600_ex6_config_temp_alert.py
 #
 #   This example outputs the ambient and thermocouple temperatures from the MCP9600 sensor, but allows for a non
 #   K-type thermocouple to be used.
@@ -82,7 +82,7 @@ def runExample():
 	myThermo.config_alert_mode(falling_alert, 1)
 	myThermo.config_alert_enable(falling_alert, True)
 
-	# TODO: This is maybe a bit too messy/verbose for users to have to do.
+	# TODO: This is maybe a bit too messy/verbose for users to have to look at. But the arduino lib had it...
 	print("alert 1 hysteresis: ", bin(myThermo.read_block_retry(myThermo.kRegisterAlert1Hysteresis, 1)[0]))
 	a1_limit_bytes = myThermo.read_block_retry(myThermo.kRegisterAlert1Limit, 2)
 	print("alert 1 limit: ", bin(a1_limit_bytes[0] << 8 | a1_limit_bytes[1]))
@@ -94,21 +94,26 @@ def runExample():
 	print("alert 3 config: ", bin(myThermo.read_block_retry(myThermo.kRegisterAlert3Config, 1)[0]))
 
 	start_time = time.time()
-	update_time = 20
+	update_time = 1
 
 	while True:
-		if (time.time() - start_time >= update_time): # Update every 20 seconds w/o blocking
-			print(f"Thermocouple: {myThermo.get_thermocouple_temp()} °C   Ambient: {myThermo.get_ambient_temp()} °C   Temperature Delta: {myThermo.get_temp_delta()} °C")
+		if (time.time() - start_time >= update_time): # Update every second w/o blocking
+			print(f"Thermocouple: {myThermo.get_thermocouple_temp()}C   Ambient: {myThermo.get_ambient_temp()}C   Temperature Delta: {myThermo.get_temp_delta()}C")
 
 			if myThermo.is_temp_greater_than_limit(rising_alert):
 				print("Temperature exceeds limit 1!")
+				print("Clearing alert 1...")
+				myThermo.clear_alert_pin(rising_alert)
+
 
 			if myThermo.is_temp_greater_than_limit(falling_alert):
 				print("Temperature exceeds limit 3!")
+				print("Clearing alert 3...")
+				myThermo.clear_alert_pin(falling_alert)
 
 			start_time = time.time()
 		
-		# TODO: Arduino example also cleared alerts based on non-blocking user input on the command line. 
+		# TODO: Arduino example cleared alerts based on non-blocking user input on the command line. 
 		# 		For Python, that is platform specific so we might want to address if that's necessary or what a good alternative is...
 
 if __name__ == '__main__':

@@ -229,11 +229,7 @@ class QwiicMCP9600(object):
         """
 
         # Check if connected by seeing if an ACK is received
-        if not self._i2c.isDeviceConnected(self.address):
-            return False
-        
-        return self.check_device_id()
-     
+        return self._i2c.isDeviceConnected(self.address)
 
     connected = property(is_connected)
 
@@ -243,9 +239,13 @@ class QwiicMCP9600(object):
 
         :return: Returns `True` if successful, otherwise `False`
         :rtype: bool
+
+        From Arduino Lib:
+        The MCP9600 is a fussy device. If we call isConnected twice in succession, the second call fails
+        as the MCP9600 does not ACK on the second call. Only on the first.
+        So we should not call is_connected here(). We should only call check_device_id().
         """
-        # Confirm device is connected before doing anything
-        return self.is_connected()
+        return self.check_device_id()
 
     def check_device_id(self):
         """
@@ -258,8 +258,8 @@ class QwiicMCP9600(object):
         # According to Arduino lib: this is here because the first read doesn't seem to work, but the second does. No idea why :/
         self.read_block_retry(self.kRegisterDeviceId, 2)
 
-        device_id_upper = self.read_block_retry(self.address, self.kRegisterDeviceId, 2)
-        
+        device_id_upper = self.read_block_retry(self.kRegisterDeviceId, 2)
+
         if device_id_upper == -1: # We were unable to read the device ID successfully
             return False
         
@@ -284,15 +284,32 @@ class QwiicMCP9600(object):
         for i in range(self.kRetryAttempts):
             try:
                 # Read the register
-                value = self._i2c.read_block(self.address, register)
+                value = self._i2c.read_block(self.address, register, num_bytes)
             except:
                 # If there's an error, try again
                 continue
             else:
                 # If no error, return the value
-                return value
+                return list(value)
         
         return -1
+    
+    def write_double_register(self, register, value):
+        """
+        Writes a 16-bit value to a register
+
+        :param register: The register to write to
+        :type register: int
+
+        :param value: The value to write
+        :type value: int
+
+        Necessary because we have to write with opposite endianness as write_word
+        """
+        high_byte = (value >> 8) & 0xFF
+        low_byte = value & 0xFF
+
+        self._i2c.write_block(self.address, register, [high_byte, low_byte])
     
     def reset_to_defaults(self):
         """
@@ -309,10 +326,10 @@ class QwiicMCP9600(object):
         self._i2c.write_byte(self.address, self.kRegisterAlert2Hysteresis, 0x00)
         self._i2c.write_byte(self.address, self.kRegisterAlert3Hysteresis, 0x00)
         self._i2c.write_byte(self.address, self.kRegisterAlert4Hysteresis, 0x00)
-        self._i2c.write_word(self.address, self.kRegisterAlert1Limit, 0x0000)
-        self._i2c.write_word(self.address, self.kRegisterAlert2Limit, 0x0000)
-        self._i2c.write_word(self.address, self.kRegisterAlert3Limit, 0x0000)
-        self._i2c.write_word(self.address, self.kRegisterAlert4Limit, 0x0000)
+        self.write_double_register(self.kRegisterAlert1Limit, 0x0000)
+        self.write_double_register(self.kRegisterAlert2Limit, 0x0000)
+        self.write_double_register(self.kRegisterAlert3Limit, 0x0000)
+        self.write_double_register(self.kRegisterAlert4Limit, 0x0000)
     
     def get_thermocouple_temp(self, units = True):
         """
@@ -335,8 +352,13 @@ class QwiicMCP9600(object):
         status[0] &= ~self.kMaskDataReady
         self._i2c.write_byte(self.address, self.kRegisterSensorStatus, status[0])
 
-        celcius = (raw[0] << 8 | raw[1]) * self.kDeviceResolution
-        
+        celcius = (raw[0] << 8 | raw[1])
+        # convert from unsigned 16-bit value to a signed 16-bit value
+        if celcius > 32767:
+            celcius -= 65536
+
+        celcius *= self.kDeviceResolution
+
         return celcius if units else celcius * 1.8 + 32
 
     def get_ambient_temp(self, units=True):
@@ -352,7 +374,13 @@ class QwiicMCP9600(object):
         if raw == -1:
             return -1
 
-        celcius = (raw[0] << 8 | raw[1]) * self.kDeviceResolution
+        celcius = (raw[0] << 8 | raw[1])
+        # convert from unsigned 16-bit value to a signed 16-bit value
+        if celcius > 32767:
+            celcius -= 65536
+
+        celcius *= self.kDeviceResolution
+
         return celcius if units else celcius * 1.8 + 32
     
     def get_temp_delta(self, units=True):
@@ -368,7 +396,13 @@ class QwiicMCP9600(object):
         if raw == -1:
             return -1
 
-        celcius = (raw[0] << 8 | raw[1]) * self.kDeviceResolution
+        celcius = (raw[0] << 8 | raw[1])
+        # convert from unsigned 16-bit value to a signed 16-bit value
+        if celcius > 32767:
+            celcius -= 65536
+
+        celcius *= self.kDeviceResolution
+
         return celcius if units else celcius * 1.8 + 32
     
     def get_raw_adc(self):
@@ -793,7 +827,7 @@ class QwiicMCP9600(object):
             signed_temp_limit |= self.kAlertLimitMaskSignBit   # if the original temp limit was negative we shifted away the sign bit, so reapply it if necessary
 
         # Write the new temp limit to the MCP9600, return if it was successful
-        return self._i2c.write_word(self.address, temp_limit_register, signed_temp_limit)
+        return self.write_double_register(temp_limit_register, signed_temp_limit)
     
     def config_alert_junction(self, number, junction):
         """
