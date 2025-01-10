@@ -33,7 +33,7 @@
 # SOFTWARE.
 #===============================================================================
 
-"""
+"""!
 qwiic_mcp9600
 ============
 Python module for the [SparkFun Qwiic MCP9600](https://www.sparkfun.com/products/16295)
@@ -182,15 +182,13 @@ class QwiicMCP9600(object):
     kAlertConfigMaskIntClear = 0b1 << kAlertConfigShiftIntClear
 
     def __init__(self, address=None, i2c_driver=None):
-        """
+        """!
         Constructor
 
-        :param address: The I2C address to use for the device
+        @param int, optional address: The I2C address to use for the device
             If not provided, the default address is used
-        :type address: int, optional
-        :param i2c_driver: An existing i2c driver object
+        @param I2CDriver, optional i2c_driver: An existing i2c driver object
             If not provided, a driver object is created
-        :type i2c_driver: I2CDriver, optional
         """
 
         # Use address if provided, otherwise pick the default
@@ -209,11 +207,10 @@ class QwiicMCP9600(object):
             self._i2c = i2c_driver
     
     def available(self):
-        """
+        """!
         Returns true if the thermocouple (hot) junction temperature has been updated since we last checked. Also referred to as the data ready bit.
 
-        :return: `True` if the data is ready, otherwise `False`
-        :rtype: bool
+        @return **bool** `True` if the data is ready, otherwise `False`
         """
         status = self.read_block_retry(self.kRegisterSensorStatus, 1)
         if status == -1:
@@ -221,11 +218,10 @@ class QwiicMCP9600(object):
         return (status[0] & self.kMaskDataReady) != 0
 
     def is_connected(self):
-        """
+        """!
         Determines if this device is connected
 
-        :return: `True` if connected, otherwise `False`
-        :rtype: bool
+        @return **bool** `True` if connected, otherwise `False`
         """
 
         # Check if connected by seeing if an ACK is received
@@ -234,11 +230,10 @@ class QwiicMCP9600(object):
     connected = property(is_connected)
 
     def begin(self):
-        """
+        """!
         Initializes this device with default parameters
 
-        :return: Returns `True` if successful, otherwise `False`
-        :rtype: bool
+        @return **bool** Returns `True` if successful, otherwise `False`
 
         From Arduino Lib:
         The MCP9600 is a fussy device. If we call isConnected twice in succession, the second call fails
@@ -248,11 +243,10 @@ class QwiicMCP9600(object):
         return self.check_device_id()
 
     def check_device_id(self):
-        """
+        """!
         Returns true if the constant upper 8 bits in the device ID register are what they should be according to the datasheet.
 
-        :return: `True` if the device ID is correct, otherwise `False`
-        :rtype: bool
+        @return **bool** `True` if the device ID is correct, otherwise `False`
         """
         
         # According to Arduino lib: this is here because the first read doesn't seem to work, but the second does. No idea why :/
@@ -266,19 +260,15 @@ class QwiicMCP9600(object):
         return device_id_upper[0] == self.kDeviceIdUpper
 
     def read_block_retry(self, register, num_bytes):
-        """
+        """!
         Attempt to read the register until we exit with no error code
         This attempts to fix the bug where clock stretching sometimes failes, as
         described in the MCP9600 eratta. Maximum retries defined by kRetryAttempts.
 
-        :param register: The register to read
-        :type register: int
+        @param int register: The register to read
+        @param int num_bytes: The number of bytes to read
 
-        :param num_bytes: The number of bytes to read
-        :type num_bytes: int
-
-        :return: The value of the register
-        :rtype: int
+        @return **int** The value of the register
         """
 
         for i in range(self.kRetryAttempts):
@@ -295,14 +285,11 @@ class QwiicMCP9600(object):
         return -1
     
     def write_double_register(self, register, value):
-        """
+        """!
         Writes a 16-bit value to a register
 
-        :param register: The register to write to
-        :type register: int
-
-        :param value: The value to write
-        :type value: int
+        @param int register: The register to write to
+        @param int value: The value to write
 
         Necessary because we have to write with opposite endianness as write_word
         """
@@ -312,7 +299,7 @@ class QwiicMCP9600(object):
         self._i2c.write_block(self.address, register, [high_byte, low_byte])
     
     def reset_to_defaults(self):
-        """
+        """!
         Resets all device parameters to their default values.
         """
         self._i2c.write_byte(self.address, self.kRegisterSensorStatus, 0x00)
@@ -332,13 +319,13 @@ class QwiicMCP9600(object):
         self.write_double_register(self.kRegisterAlert4Limit, 0x0000)
     
     def get_thermocouple_temp(self, units = True):
-        """
+        """!
         Returns the thermocouple temperature, and clears the data ready bit. Set units to true for Celcius, or false for freedom units (Fahrenheit)
 
-        :param units: The units to use for the temperature as specified above
-        :type units: bool, optional
+        @param bool, optional units: The units to use for the temperature as specified above
 
-        :return: The temperature of the thermocouple or -1 on error
+        @return  The temperature of the thermocouple or -1 on error
+        
         """
         raw = self.read_block_retry(self.kRegisterHotJuncTemp, 2)
         if raw == -1:
@@ -362,13 +349,13 @@ class QwiicMCP9600(object):
         return celcius if units else celcius * 1.8 + 32
 
     def get_ambient_temp(self, units=True):
-        """
+        """!
         Returns the ambient (IC die) temperature. Set units to true for Celsius, or false for Fahrenheit.
 
-        :param units: The units to use for the temperature as specified above
-        :type units: bool, optional
+        @param bool, optional units: The units to use for the temperature as specified above
 
-        :return: The temperature of the ambient sensor or -1 on error
+        @return  The temperature of the ambient sensor or -1 on error
+        
         """
         raw = self.read_block_retry(self.kRegisterColdJuncTemp, 2)
         if raw == -1:
@@ -384,13 +371,13 @@ class QwiicMCP9600(object):
         return celcius if units else celcius * 1.8 + 32
     
     def get_temp_delta(self, units=True):
-        """
+        """!
         Returns the difference in temperature between the thermocouple and ambient junctions. Set units to true for Celsius, or false for Fahrenheit.
-        
-        :param units: The units to use for the temperature as specified above
-        :type units: bool, optional
 
-        :return: The temperature difference or -1 on error
+        @param bool, optional units: The units to use for the temperature as specified above
+
+        @return  The temperature difference or -1 on error
+        
         """
         raw = self.read_block_retry(self.kRegisterDeltaJuncTemp, 2)
         if raw == -1:
@@ -406,10 +393,11 @@ class QwiicMCP9600(object):
         return celcius if units else celcius * 1.8 + 32
     
     def get_raw_adc(self):
-        """
+        """!
         Returns the raw contents of the raw ADC register
 
-        :return: The raw ADC value or -1 on error
+        @return  The raw ADC value or -1 on error
+        
         """
 
         raw = self.read_block_retry(self.kRegisterRawAdc, 3)
@@ -419,11 +407,10 @@ class QwiicMCP9600(object):
         return (raw[0] << 16 | raw[1] << 8 | raw[2])
     
     def is_input_range_exceeded(self):
-        """
+        """!
         Returns true if the input range has been exceeded
 
-        :return: `True` if the input range has been exceeded, otherwise `False`
-        :rtype: bool
+        @return **bool** `True` if the input range has been exceeded, otherwise `False`
         """
         status = self.read_block_retry(self.kRegisterSensorStatus, 1)
         if status == -1:
@@ -433,17 +420,15 @@ class QwiicMCP9600(object):
     
     # --------------------------- Measurement Configuration ---------------
     def set_ambient_resolution(self, res):
-        """
+        """!
         Changes the resolution on the cold (ambient) junction, for either 0.0625 or 0.25 degree C resolution. Lower resolution reduces conversion time.
         Valid inputs are:
             kAmbientResolutionZeroPoint0625
             kAmbientResolutionZeroPoint25
 
-        :param res: The resolution to use for the ambient sensor
-        :type res: int
+        @param int res: The resolution to use for the ambient sensor
 
-        :return: `True` if the resolution was set successfully, otherwise `False`
-        :rtype: bool
+        @return **bool** `True` if the resolution was set successfully, otherwise `False`
         """
         if res not in [self.kAmbientResolutionZeroPoint0625, self.kAmbientResolutionZeroPoint25]:
             return False
@@ -466,11 +451,10 @@ class QwiicMCP9600(object):
         return True
     
     def get_ambient_resolution(self):
-        """
+        """!
         Returns the resolution on the cold (ambient) junction, for either 0.0625 or 0.25 degree C resolution. Lower resolution reduces conversion time.
 
-        :return: The resolution of the ambient sensor or -1 on error
-        :rtype: int
+        @return **int** The resolution of the ambient sensor or -1 on error
         """
         config = self.read_block_retry(self.kRegisterDeviceConfig, 1)
         if config == -1:
@@ -479,7 +463,7 @@ class QwiicMCP9600(object):
         return (config[0] >> self.kConfigShiftColdJuncRes) & 0x01
     
     def set_thermocouple_resolution(self, res):
-        """
+        """!
         Changes the resolution on the hot (thermocouple) junction, for either 18, 16, 14, or 12-bit resolution. Lower resolution reduces conversion time.
         Valid inputs are:
             kThermocoupleResolution18Bit
@@ -487,11 +471,9 @@ class QwiicMCP9600(object):
             kThermocoupleResolution14Bit
             kThermocoupleResolution12Bit
 
-        :param res: The resolution to use for the thermocouple sensor
-        :type res: int
+        @param int res: The resolution to use for the thermocouple sensor
 
-        :return: `True` if the resolution was set successfully, otherwise `False`
-        :rtype: bool
+        @return **bool** `True` if the resolution was set successfully, otherwise `False`
         """
         if res not in [self.kThermocoupleResolution18Bit, self.kThermocoupleResolution16Bit, self.kThermocoupleResolution14Bit, self.kThermocoupleResolution12Bit]:
             return False
@@ -514,12 +496,11 @@ class QwiicMCP9600(object):
         return True
     
     def get_thermocouple_resolution(self):
-        """
+        """!
         Returns the resolution on the hot (thermocouple) junction, for either 18, 16, 14, or 12-bit resolution. Lower resolution reduces conversion time.
-        
-        :return: The resolution of the thermocouple sensor or -1 on error
-        :rtype: int
-        
+
+        @return **int** The resolution of the thermocouple sensor or -1 on error
+
         Possible return values:
             kThermocoupleResolution18Bit
             kThermocoupleResolution16Bit
@@ -533,7 +514,7 @@ class QwiicMCP9600(object):
         return ((config[0] & self.kConfigMaskADCResolution ) >> self.kConfigShiftADCResolution)
 
     def set_thermocouple_type(self, type):
-        """
+        """!
         Changes the type of thermocouple connected to the MCP9600. Supported types are:
             kTypeK
             kTypeJ
@@ -544,11 +525,9 @@ class QwiicMCP9600(object):
             kTypeB
             kTypeR
 
-        :param type: The type of thermocouple to use
-        :type type: int
+        @param int type: The type of thermocouple to use
 
-        :return: `True` if the type was set successfully, otherwise `False`
-        :rtype: bool
+        @return **bool** `True` if the type was set successfully, otherwise `False`
         """
         if type not in [self.kTypeK, self.kTypeJ, self.kTypeT, self.kTypeN, self.kTypeS, self.kTypeE, self.kTypeB, self.kTypeR]:
             return False
@@ -573,7 +552,7 @@ class QwiicMCP9600(object):
         return True
     
     def get_thermocouple_type(self):
-        """
+        """!
         Returns the type of thermocouple connected to the MCP9600 as found in its configuration register. 
         Supported types are:
             kTypeK
@@ -585,8 +564,7 @@ class QwiicMCP9600(object):
             kTypeB
             kTypeR
 
-        :return: The type of thermocouple sensor or -1 on error
-        :rtype: int
+        @return **int** The type of thermocouple sensor or -1 on error
         """
 
         config = self.read_block_retry(self.kRegisterThermoSensorConfig, 1)
@@ -596,14 +574,12 @@ class QwiicMCP9600(object):
         return ((config[0] & self.kThermoSensorConfigMaskType ) >> self.kThermoSensorConfigShiftType)
     
     def set_filter_coefficient(self, filter):
-        """
+        """!
         Changes the weight of the on-chip exponential moving average filter. Set this to 0 for no filter, 1 for minimum filter, and 7 for maximum filter.
-        
-        :param filter: The filter coefficient to use
-        :type filter: int
 
-        :return: `True` if the filter coefficient was set successfully, otherwise `False`
-        :rtype: bool
+        @param int filter: The filter coefficient to use
+
+        @return **bool** `True` if the filter coefficient was set successfully, otherwise `False`
 
         TODO: Arduino function for this looked a bit odd...it might need to be reworked
         """
@@ -630,11 +606,10 @@ class QwiicMCP9600(object):
         return True
     
     def get_filter_coefficient(self):
-        """
+        """!
         Returns the weight of the on-chip exponential moving average filter.
 
-        :return: The filter coefficient or -1 on error
-        :rtype: int
+        @return **int** The filter coefficient or -1 on error
         """
         config = self.read_block_retry(self.kRegisterThermoSensorConfig, 1)
         if config == -1:
@@ -645,11 +620,10 @@ class QwiicMCP9600(object):
         return coeff
 
     def set_burst_samples(self, samples):
-        """
+        """!
         Changes the amount of samples to take in burst mode.
 
-        :param samples: The number of samples to take in burst mode
-        :type samples: int
+        @param int samples: The number of samples to take in burst mode
 
         Available options are:
             kBurstSample1
@@ -661,8 +635,7 @@ class QwiicMCP9600(object):
             kBurstSample64
             kBurstSample128
 
-        :return: `True` if the burst samples were set successfully, otherwise `False`
-        :rtype: bool
+        @return **bool** `True` if the burst samples were set successfully, otherwise `False`
         """
         if samples not in [self.kBurstSample1, self.kBurstSample2, self.kBurstSample4, self.kBurstSample8, self.kBurstSample16, self.kBurstSample32, self.kBurstSample64, self.kBurstSample128]:
             return False
@@ -687,11 +660,10 @@ class QwiicMCP9600(object):
         return True
     
     def get_burst_samples(self):
-        """
+        """!
         Returns the amount of samples to take in burst mode, according to the device's configuration register.
 
-        :return: The number of samples to take in burst mode or -1 on error
-        :rtype: int
+        @return **int** The number of samples to take in burst mode or -1 on error
 
         Possible return values:
             kBurstSample1
@@ -711,11 +683,10 @@ class QwiicMCP9600(object):
         return samples
     
     def burst_available(self):
-        """
+        """!
         Checks if burst mode data is available.
 
-        :return: Returns `True` if all the burst samples have been taken and the results are ready. Returns `False` otherwise.
-        :rtype: bool
+        @return **bool** Returns `True` if all the burst samples have been taken and the results are ready. Returns `False` otherwise.
         """
         status = self.read_block_retry(self.kRegisterSensorStatus, 1)
         if status == -1:
@@ -724,11 +695,10 @@ class QwiicMCP9600(object):
         return (status[0] & self.kMaskBurstComplete) != 0
     
     def start_burst(self):
-        """
+        """!
         Initiates a burst on the MCP9600.
-        
-        :return: `True` if the burst was started successfully, otherwise `False`
-        :rtype: bool
+
+        @return **bool** `True` if the burst was started successfully, otherwise `False`
         """
         status = self.read_block_retry(self.kRegisterSensorStatus, 1)
         if status == -1:
@@ -742,18 +712,17 @@ class QwiicMCP9600(object):
         return self.set_shutdown_mode(self.kShutdownModeBurst)
 
     def set_shutdown_mode(self, mode):
-        """
+        """!
         Changes the shutdown "operating" mode of the MCP9600. Configurable to Normal, Shutdown, and Burst.
 
-        :param mode: The mode to set the device to
-        :type mode: int
+        @param int mode: The mode to set the device to
+
         Available options are:
             kShutdownModeNormal
             kShutdownModeShutdown
             kShutdownModeBurst
-        
-        :return: `True` if the mode was set successfully, otherwise `False`
-        :rtype: bool
+
+        @return **bool** `True` if the mode was set successfully, otherwise `False`
         """
 
         config = self.read_block_retry(self.kRegisterDeviceConfig, 1)
@@ -774,11 +743,10 @@ class QwiicMCP9600(object):
         return True
     
     def get_shutdown_mode(self, mode):
-        """
+        """!
         Returns the shutdown "operating" mode of the MCP9600. Configurable to Normal, Shutdown, and Burst.
 
-        :return: The current mode of the device or -1 on error
-        :rtype: int
+        @return **int** The current mode of the device or -1 on error
 
         Possible return values:
             kShutdownModeNormal
@@ -794,16 +762,13 @@ class QwiicMCP9600(object):
     
     #---------------------------- Temperature Alerts -------------------
     def config_alert_temp(self, number, temp):
-        """
+        """!
         Configures the temperature at which to trigger the alert for a given alert number.
-        
-        :param number: The alert number (1-4)
-        :type number: int
-        :param temp: The temperature at which to trigger the alert
-        :type temp: float
 
-        :return: `True` if the alert temperature was set successfully, otherwise `False`
-        :rtype: bool
+        @param int number: The alert number (1-4)
+        @param float temp: The temperature at which to trigger the alert
+
+        @return **bool** `True` if the alert temperature was set successfully, otherwise `False`
         """
         
         # Pick the right register to put the temp limit in
@@ -830,16 +795,13 @@ class QwiicMCP9600(object):
         return self.write_double_register(temp_limit_register, signed_temp_limit)
     
     def config_alert_junction(self, number, junction):
-        """
+        """!
         Configures the junction to monitor the temperature of to trigger the alert. Set to fALSE for the thermocouple (hot) junction, or True for the ambient (cold) junction.
 
-        :param number: The alert number (1-4)
-        :type number: int
-        :param junction: The junction to monitor False for the hot junction, True for the cold junction
-        :type junction: bool
+        @param int number: The alert number (1-4)
+        @param bool junction: The junction to monitor False for the hot junction, True for the cold junction
 
-        :return: `True` if the junction was set successfully, otherwise `False`
-        :rtype: bool
+        @return **bool** `True` if the junction was set successfully, otherwise `False`
         """
 
         # Pick the register that points to the right alert
@@ -870,16 +832,13 @@ class QwiicMCP9600(object):
         return True
     
     def config_alert_hysteresis(self, number, hysteresis):
-        """
+        """!
         Configures the hysteresis to use around the temperature set point, in degrees Celsius.
 
-        :param number: The alert number (1-4)
-        :type number: int
-        :param hysteresis: The hysteresis value to set
-        :type hysteresis: float
+        @param int number: The alert number (1-4)
+        @param float hysteresis: The hysteresis value to set
 
-        :return: `True` if the hysteresis was set successfully, otherwise `False`
-        :rtype: bool
+        @return **bool** `True` if the hysteresis was set successfully, otherwise `False`
         """
         
         # Pick the register that points to the right alert
@@ -899,16 +858,13 @@ class QwiicMCP9600(object):
         return True
     
     def config_alert_edge(self, number, edge):
-        """
+        """!
         Configures whether to trigger the alert on the rising (cold -> hot) or falling (hot -> cold) edge of the temperature change. Set to True for rising, False for falling.
-        
-        :param number: The alert number (1-4)
-        :type number: int
-        :param edge: The edge to trigger the alert on
-        :type edge: bool
 
-        :return: `True` if the edge was set successfully, otherwise `False`
-        :rtype: bool
+        @param int number: The alert number (1-4)
+        @param bool edge: The edge to trigger the alert on
+
+        @return **bool** `True` if the edge was set successfully, otherwise `False`
         """
         # Pick the register that points to the right alert
         if number == 1:
@@ -938,16 +894,13 @@ class QwiicMCP9600(object):
         return True
 
     def config_alert_logic_level(self, number, level):
-        """
+        """!
         Configures whether the hardware alert pin is active-high or active-low. Set to True for active-high, False for active-low.
 
-        :param number: The alert number (1-4)
-        :type number: int
-        :param level: The logic level to set
-        :type level: bool
+        @param int number: The alert number (1-4)
+        @param bool level: The logic level to set
 
-        :return: `True` if the logic level was set successfully, otherwise `False`
-        :rtype: bool
+        @return **bool** `True` if the logic level was set successfully, otherwise `False`
         """
         # Pick the register that points to the right alert
         if number == 1:
@@ -977,16 +930,13 @@ class QwiicMCP9600(object):
         return True
 
     def config_alert_mode(self, number, mode):
-        """
+        """!
         Configures whether the MCP9600 treats the alert like a comparator or an interrrupt. Set to True for interrupt, False for comparator. More information is on pg. 34 of the datasheet.
 
-        :param number: The alert number (1-4)
-        :type number: int
-        :param mode: The mode to set the alert to
-        :type mode: bool
+        @param int number: The alert number (1-4)
+        @param bool mode: The mode to set the alert to
 
-        :return: `True` if the alert mode was set successfully, otherwise `False`
-        :rtype: bool
+        @return **bool** `True` if the alert mode was set successfully, otherwise `False`
         """
         # Pick the register that points to the right alert
         if number == 1:
@@ -1017,16 +967,13 @@ class QwiicMCP9600(object):
         return True
 
     def config_alert_enable(self, number, enable):
-        """
+        """!
         Configures whether or not the interrupt is enabled or not. Set to True to enable, or False to disable.
 
-        :param number: The alert number (1-4)
-        :type number: int
-        :param enable: Set to True to enable the alert, False to disable
-        :type enable: bool
+        @param int number: The alert number (1-4)
+        @param bool enable: Set to True to enable the alert, False to disable
 
-        :return: `True` if the alert was enabled/disabled successfully, otherwise `False`
-        :rtype: bool
+        @return **bool** `True` if the alert was enabled/disabled successfully, otherwise `False`
         """
         # Pick the register that points to the right alert
         if number == 1:
@@ -1057,14 +1004,12 @@ class QwiicMCP9600(object):
         return True
 
     def clear_alert_pin(self, number):
-        """
+        """!
         Clears the interrupt on the specified alert channel, resetting the value of the pin.
 
-        :param number: The alert number (1-4)
-        :type number: int
+        @param int number: The alert number (1-4)
 
-        :return: `True` if the alert pin was cleared successfully, otherwise `False`
-        :rtype: bool
+        @return **bool** `True` if the alert pin was cleared successfully, otherwise `False`
         """
         # Pick the register that points to the right alert
         if number == 1:
@@ -1092,14 +1037,12 @@ class QwiicMCP9600(object):
         return True
 
     def is_temp_greater_than_limit(self, number):
-        """
+        """!
         Returns true if the interrupt has been triggered, false otherwise
 
-        :param number: The alert number (1-4)
-        :type number: int
+        @param int number: The alert number (1-4)
 
-        :return: `True` if the temperature is greater than the limit, otherwise `False`
-        :rtype: bool
+        @return **bool** `True` if the temperature is greater than the limit, otherwise `False`
         """
         if number < 1 or number > 4:
             return False  # if a nonexistent alert number is given, return False
