@@ -7,9 +7,9 @@ NOTE: Any numbering of examples is to retain consistency with the Arduino librar
 This example outputs the ambient and thermocouple temperatures from the MCP9600 sensor.
 
 The key methods showcased by this example are: 
--[get_thermocouple_temp()](https://docs.sparkfun.com/qwiic_mcp9600_py/classqwiic__mcp9600_1_1_qwiic_m_c_p9600.html#ac9940bd91f304a151cf05bc2243f708b)
--[get_ambient_temp()](https://docs.sparkfun.com/qwiic_mcp9600_py/classqwiic__mcp9600_1_1_qwiic_m_c_p9600.html#a5d682f85067884a617c937e5983c35ad)
--[get_temp_delta()](https://docs.sparkfun.com/qwiic_mcp9600_py/classqwiic__mcp9600_1_1_qwiic_m_c_p9600.html#a87caccd4810dd5245933c59f26996261)
+- [get_thermocouple_temp()](https://docs.sparkfun.com/qwiic_mcp9600_py/classqwiic__mcp9600_1_1_qwiic_m_c_p9600.html#ac9940bd91f304a151cf05bc2243f708b)
+- [get_ambient_temp()](https://docs.sparkfun.com/qwiic_mcp9600_py/classqwiic__mcp9600_1_1_qwiic_m_c_p9600.html#a5d682f85067884a617c937e5983c35ad)
+- [get_temp_delta()](https://docs.sparkfun.com/qwiic_mcp9600_py/classqwiic__mcp9600_1_1_qwiic_m_c_p9600.html#a87caccd4810dd5245933c59f26996261)
 
 ## Qwiic Mcp9600 Ex2 Set Type
 This example outputs the ambient and thermocouple temperatures from the MCP9600 sensor, but allows for a non
@@ -17,8 +17,8 @@ This example outputs the ambient and thermocouple temperatures from the MCP9600 
    The Qwiic MCP9600 supports K/J/T/N/S/E/B/R type thermocouples, and the type can be configured below!
 
 The key methods showcased by this example are: 
--[set_thermocouple_type()](https://docs.sparkfun.com/qwiic_mcp9600_py/classqwiic__mcp9600_1_1_qwiic_m_c_p9600.html#ad0e860652d41399bdebda49b52df4fc7)
--[get_thermocouple_type()](https://docs.sparkfun.com/qwiic_mcp9600_py/classqwiic__mcp9600_1_1_qwiic_m_c_p9600.html#a8661ff3c9fdb7bfb9fdeb6d7b3bc8e59)
+- [set_thermocouple_type()](https://docs.sparkfun.com/qwiic_mcp9600_py/classqwiic__mcp9600_1_1_qwiic_m_c_p9600.html#ad0e860652d41399bdebda49b52df4fc7)
+- [get_thermocouple_type()](https://docs.sparkfun.com/qwiic_mcp9600_py/classqwiic__mcp9600_1_1_qwiic_m_c_p9600.html#a8661ff3c9fdb7bfb9fdeb6d7b3bc8e59)
 
 ## Qwiic Mcp9600 Ex3 Set Filter
 This example outputs the ambient and thermocouple temperatures from the MCP9600 sensor, but allows the filtering
@@ -35,8 +35,8 @@ This example outputs the ambient and thermocouple temperatures from the MCP9600 
    https://github.com/sparkfun/SparkFun_MCP9600_Arduino_Library/issues/1
 
 The key methods showcased by this example are: 
--[set_filter_coefficient()](https://docs.sparkfun.com/qwiic_mcp9600_py/classqwiic__mcp9600_1_1_qwiic_m_c_p9600.html#a6daf5a5884e5b387d4031b79306f4e44)
--[get_filter_coefficient()](https://docs.sparkfun.com/qwiic_mcp9600_py/classqwiic__mcp9600_1_1_qwiic_m_c_p9600.html#abc11311690fa5e7ba6d6516944e7cd1d)
+- [set_filter_coefficient()](https://docs.sparkfun.com/qwiic_mcp9600_py/classqwiic__mcp9600_1_1_qwiic_m_c_p9600.html#a6daf5a5884e5b387d4031b79306f4e44)
+- [get_filter_coefficient()](https://docs.sparkfun.com/qwiic_mcp9600_py/classqwiic__mcp9600_1_1_qwiic_m_c_p9600.html#abc11311690fa5e7ba6d6516944e7cd1d)
 
 ## Qwiic Mcp9600 Ex4 Set Resolution
 This example allows you to change the ADC resolution on the thermocouple (hot) and ambient (cold) junctions. Why
@@ -68,8 +68,8 @@ This example allows you to change the ADC resolution on the thermocouple (hot) a
    specification on how many degrees Celcius precision you will get for a given ADC resolution.
 
 The key methods showcased by this example are: 
--[set_ambient_resolution()](https://docs.sparkfun.com/qwiic_mcp9600_py/classqwiic__mcp9600_1_1_qwiic_m_c_p9600.html#a650e2c0e827a41d7f24151712fffaff8)
--[set_thermocouple_resolution()](https://docs.sparkfun.com/qwiic_mcp9600_py/classqwiic__mcp9600_1_1_qwiic_m_c_p9600.html#adbc72e448b756348ad1868dba742e9f8)
+- [set_ambient_resolution()](https://docs.sparkfun.com/qwiic_mcp9600_py/classqwiic__mcp9600_1_1_qwiic_m_c_p9600.html#a650e2c0e827a41d7f24151712fffaff8)
+- [set_thermocouple_resolution()](https://docs.sparkfun.com/qwiic_mcp9600_py/classqwiic__mcp9600_1_1_qwiic_m_c_p9600.html#adbc72e448b756348ad1868dba742e9f8)
 
 ## Qwiic Mcp9600 Ex5 Burst Mode
 This example configures the shutdown (or "operating") mode that the MCP9600 runs in. Shutdown mode disables all
@@ -79,9 +79,9 @@ This example configures the shutdown (or "operating") mode that the MCP9600 runs
    through that process!
 
 The key methods showcased by this example are: 
--[set_burst_samples()](https://docs.sparkfun.com/qwiic_mcp9600_py/classqwiic__mcp9600_1_1_qwiic_m_c_p9600.html#a3545c61b0b75a26c0a7a80c8fc9c474e)
--[set_shutdown_mode()](https://docs.sparkfun.com/qwiic_mcp9600_py/classqwiic__mcp9600_1_1_qwiic_m_c_p9600.html#a245ed0e178559252ac2bbf28ce29ea26)
--[start_burst()](https://docs.sparkfun.com/qwiic_mcp9600_py/classqwiic__mcp9600_1_1_qwiic_m_c_p9600.html#a47afd394f60b6cf789e07a43f71b4613)
+- [set_burst_samples()](https://docs.sparkfun.com/qwiic_mcp9600_py/classqwiic__mcp9600_1_1_qwiic_m_c_p9600.html#a3545c61b0b75a26c0a7a80c8fc9c474e)
+- [set_shutdown_mode()](https://docs.sparkfun.com/qwiic_mcp9600_py/classqwiic__mcp9600_1_1_qwiic_m_c_p9600.html#a245ed0e178559252ac2bbf28ce29ea26)
+- [start_burst()](https://docs.sparkfun.com/qwiic_mcp9600_py/classqwiic__mcp9600_1_1_qwiic_m_c_p9600.html#a47afd394f60b6cf789e07a43f71b4613)
 
 ## Qwiic Mcp9600 Ex6 Config Temp Alert
 This example outputs the ambient and thermocouple temperatures from the MCP9600 sensor, but allows for a non
@@ -89,10 +89,10 @@ This example outputs the ambient and thermocouple temperatures from the MCP9600 
    The Qwiic MCP9600 supports K/J/T/N/S/E/B/R type thermocouples, and the type can be configured below!
 
 The key methods showcased by this example are: 
--[config_alert_hysteresis()](https://docs.sparkfun.com/qwiic_mcp9600_py/classqwiic__mcp9600_1_1_qwiic_m_c_p9600.html#a76f2bfeda0a83e125168c54b6583d99b)
--[config_alert_temp()](https://docs.sparkfun.com/qwiic_mcp9600_py/classqwiic__mcp9600_1_1_qwiic_m_c_p9600.html#a552adb1c087deb5dcafcc248ff8bb889)
--[config_alert_junction()](https://docs.sparkfun.com/qwiic_mcp9600_py/classqwiic__mcp9600_1_1_qwiic_m_c_p9600.html#a24bfca2624508729dc0a2313b1744114)
--[config_alert_edge()](https://docs.sparkfun.com/qwiic_mcp9600_py/classqwiic__mcp9600_1_1_qwiic_m_c_p9600.html#a8932346c8ddabdb0dc8565ffa5329361)
--[config_alert_logic_level()](https://docs.sparkfun.com/qwiic_mcp9600_py/classqwiic__mcp9600_1_1_qwiic_m_c_p9600.html#a6705d5c1c4626607c921b04c3a2c049b)
--[config_alert_mode()](https://docs.sparkfun.com/qwiic_mcp9600_py/classqwiic__mcp9600_1_1_qwiic_m_c_p9600.html#a3d7fe9b5360f5fe91daf261a9a2e70da)
--[config_alert_enable()](https://docs.sparkfun.com/qwiic_mcp9600_py/classqwiic__mcp9600_1_1_qwiic_m_c_p9600.html#a7caf4a16d802a2ed9852fbeecfbd8929)
+- [config_alert_hysteresis()](https://docs.sparkfun.com/qwiic_mcp9600_py/classqwiic__mcp9600_1_1_qwiic_m_c_p9600.html#a76f2bfeda0a83e125168c54b6583d99b)
+- [config_alert_temp()](https://docs.sparkfun.com/qwiic_mcp9600_py/classqwiic__mcp9600_1_1_qwiic_m_c_p9600.html#a552adb1c087deb5dcafcc248ff8bb889)
+- [config_alert_junction()](https://docs.sparkfun.com/qwiic_mcp9600_py/classqwiic__mcp9600_1_1_qwiic_m_c_p9600.html#a24bfca2624508729dc0a2313b1744114)
+- [config_alert_edge()](https://docs.sparkfun.com/qwiic_mcp9600_py/classqwiic__mcp9600_1_1_qwiic_m_c_p9600.html#a8932346c8ddabdb0dc8565ffa5329361)
+- [config_alert_logic_level()](https://docs.sparkfun.com/qwiic_mcp9600_py/classqwiic__mcp9600_1_1_qwiic_m_c_p9600.html#a6705d5c1c4626607c921b04c3a2c049b)
+- [config_alert_mode()](https://docs.sparkfun.com/qwiic_mcp9600_py/classqwiic__mcp9600_1_1_qwiic_m_c_p9600.html#a3d7fe9b5360f5fe91daf261a9a2e70da)
+- [config_alert_enable()](https://docs.sparkfun.com/qwiic_mcp9600_py/classqwiic__mcp9600_1_1_qwiic_m_c_p9600.html#a7caf4a16d802a2ed9852fbeecfbd8929)
